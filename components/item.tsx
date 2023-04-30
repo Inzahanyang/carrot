@@ -3,7 +3,7 @@ import Link from "next/link";
 interface ItemProps {
   title: string;
   id: number;
-  price: number;
+  price: string;
   comments: number;
   hearts: number;
 }
@@ -17,14 +17,16 @@ export default function Item({
 }: ItemProps) {
   return (
     <Link
-      href={`/items/${id}`}
+      href={`/products/${id}`}
       className="flex cursor-pointer justify-between px-4 pt-5"
     >
       <div className="flex space-x-4">
         <div className="h-20 w-20 rounded-md bg-gray-400" />
         <div className="flex flex-col pt-2">
-          <h3 className="text-sm font-medium text-gray-900">{title}</h3>
-          <span className="mt-1 font-medium text-gray-900">${price}</span>
+          <h3 className="text-sm text-gray-900">{title}</h3>
+          <span className="mt-1 text-xs font-semibold text-gray-900">
+            {price} 원
+          </span>
         </div>
       </div>
       <div className="flex items-end justify-end space-x-2">

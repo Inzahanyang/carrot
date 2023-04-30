@@ -5,7 +5,7 @@ interface UseMutationState<T> {
   data?: T;
   error?: object;
 }
-
+// 이 부분 다시 이해 필요 <T>
 type UseMutationResult<T> = [(data: any) => void, UseMutationState<T>];
 
 export default function useMutation<T = any>(

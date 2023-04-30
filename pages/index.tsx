@@ -2,22 +2,41 @@ import type { NextPage } from "next";
 import Layout from "../components/layout";
 import FloatingButton from "@/components/floating-button";
 import Item from "@/components/item";
+import Head from "next/head";
+import useSWR from "swr";
+import { Product } from "@prisma/client";
+
+interface CountWithProduct extends Product {
+  _count: {
+    favs: number;
+  };
+}
+
+interface ProductsResults {
+  ok: boolean;
+  products: CountWithProduct[];
+}
 
 const Home: NextPage = () => {
+  const { data } = useSWR<ProductsResults>("/api/products");
+
   return (
     <Layout title="홈" hasTabBar>
+      <Head>
+        <title>Home</title>
+      </Head>
       <div className="flex flex-col space-y-5 divide-y">
-        {[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1].map((_, i) => (
+        {data?.products.map((product) => (
           <Item
-            id={i}
-            key={i}
-            title="iPhone 14"
-            price={99}
-            comments={1}
-            hearts={1}
+            id={product.id}
+            key={product.id}
+            title={product.name}
+            price={product.price.toLocaleString("ko-KR")}
+            comments={0}
+            hearts={product._count.favs}
           />
         ))}
-        <FloatingButton href="/items/upload">
+        <FloatingButton href="/products/upload">
           <svg
             className="h-6 w-6"
             xmlns="http://www.w3.org/2000/svg"
