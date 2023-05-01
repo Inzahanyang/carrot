@@ -18,6 +18,7 @@ async function handler(
     include: {
       product: {
         select: {
+          id: true,
           name: true,
           price: true,
           _count: {
