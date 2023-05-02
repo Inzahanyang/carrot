@@ -1,3 +1,4 @@
+import CheckLogin from "@/libs/client/checkLogin";
 import "../styles/globals.css";
 import type { AppProps } from "next/app";
 import { SWRConfig } from "swr";
@@ -11,6 +12,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       }}
     >
       <div className="mx-auto w-full max-w-xl">
+        <CheckLogin />
         <Component {...pageProps} />
       </div>
     </SWRConfig>
