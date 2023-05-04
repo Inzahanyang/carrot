@@ -15,7 +15,7 @@ export default function Message({
     <div
       className={cls(
         "flex  items-start",
-        reversed ? "flex-row-reverse space-x-reverse" : "space-x-2"
+        reversed ? "flex-row-reverse space-x-2 space-x-reverse" : "space-x-2"
       )}
     >
       <div className="h-8 w-8 rounded-full bg-slate-400" />
