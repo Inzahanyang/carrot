@@ -1,5 +1,7 @@
-document.designMode = "on"
-
-Example : {\_count: {select: {records: {where: {kind: 'Fav'}}}}}
-
-사용하기 위해서는 generator client previewFeatures 배열에 "filteredRelationCount" 를 추가하시면 사용 가능합니다.
+<!-- Create Stream model -->
+<!-- Create stream page / api -->
+<!-- Detail page / api -->
+<!-- send message form and page, mutate / api -->
+<!-- show streams index page -->
+<!-- seeding -->
+<!-- pagination -->
