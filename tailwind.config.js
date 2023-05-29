@@ -5,7 +5,11 @@ module.exports = {
     "./components/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      backgroundImage: {
+        "base-main": "url('../public/mfood/base.png')",
+      },
+    },
   },
   plugins: [require("@tailwindcss/forms")],
 };

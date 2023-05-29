@@ -2,13 +2,15 @@ import Layout from "@/components/layout";
 import useMutation from "@/libs/client/useMutation";
 import useUser from "@/libs/client/useUser";
 import type { NextPage } from "next";
-import { useEffect } from "react";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 interface ProfileForm {
   email?: string;
   phone?: string;
   name?: string;
+  avatar?: FileList;
 }
 
 interface EditProfileResponse {
@@ -18,22 +20,55 @@ interface EditProfileResponse {
 
 const EditProfile: NextPage = () => {
   const { user } = useUser();
+
   const {
     register,
     handleSubmit,
     setValue,
     setError,
     formState: { errors },
+    watch,
   } = useForm<ProfileForm>();
+
   const [editProfile, { data, loading }] =
     useMutation<EditProfileResponse>("/api/users/me");
-  const onValid = (form: ProfileForm) => {
+
+  const onValid = async ({ email, phone, name }: ProfileForm) => {
     if (loading) return;
-    if (form.email === "" && form.phone === "") {
+    if (email === "" && phone === "") {
       return setError("root", { message: "장난쳐? 적어도 한개는 적어야지!!" });
     }
-    editProfile(form);
+
+    if (avatar && avatar.length > 0) {
+      const { uploadURL } = await (await fetch("/api/files")).json();
+      const form = new FormData();
+      form.append("file", avatar[0], user?.id + "");
+
+      const {
+        result: { id },
+      } = await (
+        await fetch(uploadURL, {
+          method: "POST",
+          body: form,
+        })
+      ).json();
+
+      editProfile({ email, phone, name, avatarId: id });
+    } else {
+      editProfile({ email, phone, name });
+    }
   };
+
+  const [avatarPreview, setAvatarPreview] = useState("");
+
+  const avatar = watch("avatar");
+
+  useEffect(() => {
+    if (avatar && avatar.length > 0) {
+      const file = avatar[0];
+      setAvatarPreview(URL.createObjectURL(file));
+    }
+  }, [avatar]);
 
   useEffect(() => {
     if (user?.name) setValue("name", user?.name);
@@ -50,13 +85,25 @@ const EditProfile: NextPage = () => {
     <Layout title="프로필 수정" canGoBack>
       <form onSubmit={handleSubmit(onValid)} className="space-y-4 py-10 px-4">
         <div className="flex items-center space-x-3">
-          <div className="h-14 w-14 rounded-full bg-slate-500" />
+          {user?.avatar ? (
+            <img
+              src={
+                avatarPreview
+                  ? avatarPreview
+                  : `https://imagedelivery.net/6WVwiW2h0KvJliuEhpAT4A/${user.avatar}/avatar`
+              }
+              className="h-14 w-14 rounded-full bg-slate-500"
+            />
+          ) : (
+            <div className="h-14 w-14 rounded-full bg-slate-500" />
+          )}
           <label
             htmlFor="picture"
             className="cursor-pointer rounded-md border border-gray-300 py-2 px-3 text-sm font-medium text-gray-700 shadow-sm focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
           >
             Change
             <input
+              {...register("avatar")}
               id="picture"
               type="file"
               className="hidden"

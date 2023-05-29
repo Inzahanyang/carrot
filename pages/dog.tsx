@@ -1,3 +1,4 @@
+import Layout from "@/components/layout";
 import { cls } from "@/libs/client/utils";
 import type { NextPage } from "next";
 import { useState } from "react";

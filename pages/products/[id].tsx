@@ -44,9 +44,19 @@ const ItemDetail: NextPage = () => {
       ) : (
         <div className="px-4 py-4">
           <div className="mb-8">
-            <div className="h-96 bg-slate-300" />
+            {data?.product.image && (
+              <img
+                src={`https://imagedelivery.net/6WVwiW2h0KvJliuEhpAT4A/${data?.product.image}/public`}
+                className="h-96 w-full rounded-md"
+              />
+            )}
             <div className="flex cursor-pointer items-center space-x-3 border-t border-b py-3">
-              <div className="h-12 w-12 rounded-full bg-slate-300" />
+              {data?.product.user.avatar && (
+                <img
+                  src={`https://imagedelivery.net/6WVwiW2h0KvJliuEhpAT4A/${data?.product.user.avatar}/avatar`}
+                  className="h-12 w-12 rounded-full bg-slate-300"
+                />
+              )}
               <div>
                 <p className="text-sm font-medium text-gray-700">
                   {data?.product?.user?.name}

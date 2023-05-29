@@ -6,13 +6,14 @@ import useMutation from "@/libs/client/useMutation";
 import { Product } from "@prisma/client";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 interface UploadForm {
   name: string;
   price: string;
   description: string;
+  image: FileList;
 }
 
 interface uploadResult {
@@ -22,13 +23,42 @@ interface uploadResult {
 
 const Upload: NextPage = () => {
   const router = useRouter();
-  const { register, handleSubmit } = useForm<UploadForm>();
+  const { register, handleSubmit, watch } = useForm<UploadForm>();
   const [upload, { data, loading, error }] =
     useMutation<uploadResult>("/api/products");
-  const onValid = (data: UploadForm) => {
+
+  const [productImgPreview, setProductImgPreview] = useState("");
+  const productImg = watch("image");
+
+  useEffect(() => {
+    if (productImg && productImg.length > 0) {
+      const file = productImg[0];
+      setProductImgPreview(URL.createObjectURL(file));
+    }
+  }, [productImg]);
+
+  const onValid = async ({ name, price, description, image }: UploadForm) => {
     if (loading) return;
-    upload(data);
+    if (image && image.length > 0) {
+      const { uploadURL } = await (await fetch("/api/files")).json();
+
+      const form = new FormData();
+
+      form.append("file", productImg[0], name);
+
+      const {
+        result: { id },
+      } = await (await fetch(uploadURL, { method: "POST", body: form })).json();
+
+      upload({ name, price, description, image: id });
+    } else {
+      upload({ name, price, description });
+    }
   };
+
+  // 이미지 업로드
+  // 이미지 존재 시 업로드 할 url 받기
+  // url 도착 시 프론트에서 직접 업로드 하기
 
   useEffect(() => {
     if (data?.ok) {
@@ -39,23 +69,35 @@ const Upload: NextPage = () => {
     <Layout canGoBack title="Upload Product">
       <form onSubmit={handleSubmit(onValid)} className="space-y-4 p-4">
         <div>
-          <label className="flex h-48 w-full cursor-pointer items-center justify-center rounded-md border-2 border-dashed border-gray-300 text-gray-600 hover:border-orange-500 hover:text-orange-500">
-            <svg
-              className="h-12 w-12"
-              stroke="currentColor"
-              fill="none"
-              viewBox="0 0 48 48"
-              aria-hidden="true"
-            >
-              <path
-                d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
+          {productImgPreview ? (
+            <img
+              src={productImgPreview}
+              className="h-auto w-full rounded-md"
+            ></img>
+          ) : (
+            <label className="flex h-48 w-full cursor-pointer items-center justify-center rounded-md border-2 border-dashed border-gray-300 text-gray-600 hover:border-orange-500 hover:text-orange-500">
+              <svg
+                className="h-12 w-12"
+                stroke="currentColor"
+                fill="none"
+                viewBox="0 0 48 48"
+                aria-hidden="true"
+              >
+                <path
+                  d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <input
+                className="hidden"
+                type="file"
+                {...register("image")}
+                accept="image/*"
               />
-            </svg>
-            <input className="hidden" type="file" />
-          </label>
+            </label>
+          )}
         </div>
         <Input
           label="Name"
