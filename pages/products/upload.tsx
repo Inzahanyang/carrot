@@ -21,44 +21,41 @@ interface uploadResult {
   product: Product;
 }
 
+// request cloudflare upload url
+// uploadURL? fetch new image by formData
+// getID? upload product model image id
+// finished? reload product id
+
 const Upload: NextPage = () => {
   const router = useRouter();
   const { register, handleSubmit, watch } = useForm<UploadForm>();
   const [upload, { data, loading, error }] =
     useMutation<uploadResult>("/api/products");
 
-  const [productImgPreview, setProductImgPreview] = useState("");
-  const productImg = watch("image");
+  const [productPreview, setProductPreview] = useState("");
+  const uploadImage = watch("image");
 
   useEffect(() => {
-    if (productImg && productImg.length > 0) {
-      const file = productImg[0];
-      setProductImgPreview(URL.createObjectURL(file));
+    if (uploadImage && uploadImage.length > 0) {
+      const file = uploadImage[0];
+      setProductPreview(URL.createObjectURL(file));
     }
-  }, [productImg]);
-
+  }, [uploadImage]);
   const onValid = async ({ name, price, description, image }: UploadForm) => {
     if (loading) return;
     if (image && image.length > 0) {
       const { uploadURL } = await (await fetch("/api/files")).json();
-
       const form = new FormData();
-
-      form.append("file", productImg[0], name);
-
+      form.append("file", uploadImage[0], name);
       const {
         result: { id },
       } = await (await fetch(uploadURL, { method: "POST", body: form })).json();
-
       upload({ name, price, description, image: id });
+      return;
     } else {
       upload({ name, price, description });
     }
   };
-
-  // 이미지 업로드
-  // 이미지 존재 시 업로드 할 url 받기
-  // url 도착 시 프론트에서 직접 업로드 하기
 
   useEffect(() => {
     if (data?.ok) {
@@ -69,11 +66,8 @@ const Upload: NextPage = () => {
     <Layout canGoBack title="Upload Product">
       <form onSubmit={handleSubmit(onValid)} className="space-y-4 p-4">
         <div>
-          {productImgPreview ? (
-            <img
-              src={productImgPreview}
-              className="h-auto w-full rounded-md"
-            ></img>
+          {productPreview ? (
+            <img src={productPreview} className="h-96 w-full rounded-md" />
           ) : (
             <label className="flex h-48 w-full cursor-pointer items-center justify-center rounded-md border-2 border-dashed border-gray-300 text-gray-600 hover:border-orange-500 hover:text-orange-500">
               <svg
@@ -91,9 +85,9 @@ const Upload: NextPage = () => {
                 />
               </svg>
               <input
+                {...register("image")}
                 className="hidden"
                 type="file"
-                {...register("image")}
                 accept="image/*"
               />
             </label>

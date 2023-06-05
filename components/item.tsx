@@ -23,8 +23,8 @@ export default function Item({
       <div className="flex space-x-4">
         <div className="h-20 w-20 rounded-md bg-gray-400" />
         <div className="flex flex-col pt-2">
-          <h3 className="text-sm text-gray-900">{title}</h3>
-          <span className="mt-1 text-xs font-semibold text-gray-900">
+          <h3 className="mt-2 text-sm text-gray-900">{title}</h3>
+          <span className="mt-3 text-xs font-semibold text-gray-900">
             {price} 원
           </span>
         </div>

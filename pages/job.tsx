@@ -140,7 +140,7 @@ const Job: NextPage = () => {
                   id="q2-4"
                   value="I don't know why"
                 />
-                <label htmlFor="q2-4">I don't know why</label>
+                <label htmlFor="q2-4">I dont know why</label>
               </div>
             </div>
           </div>
